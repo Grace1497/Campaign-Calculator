@@ -69,6 +69,16 @@ height:1px;
 background:#ffd700;
 margin:20px 0;
 }
+ 
+.fyp-row{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+ 
+.fyp-row input{
+flex:1;
+}
 </style>
 </head>
  
@@ -78,9 +88,7 @@ margin:20px 0;
  
 <h1>Campaign Payout Calculator (2026)</h1>
  
-<!-- ========================= -->
-<!-- CANDIDATE -->
-<!-- ========================= -->
+<!-- Candidate Calculator -->
  
 <div class="section">
  
@@ -112,7 +120,8 @@ margin:20px 0;
 </select>
  
 <label>FYP / Accumulated FYP</label>
-<input type="number"
+<input
+type="number"
 id="fypInput"
 value="0"
 oninput="calculateCandidate()">
@@ -120,7 +129,8 @@ oninput="calculateCandidate()">
 <div id="rookieAddOnDiv">
  
 <label>
-<input type="checkbox"
+<input
+type="checkbox"
 id="rookieActive"
 onchange="calculateCandidate()">
 Add MMK 76,500 for M0 & M1 Active
@@ -138,26 +148,46 @@ Total Candidate Payout: 0 MMK
  
 <hr>
  
-<!-- ========================= -->
-<!-- RECRUITER -->
-<!-- ========================= -->
+<!-- Recruiter Calculator -->
  
 <div class="section">
  
 <h2>Recruiter Calculator</h2>
  
 <label>Number of Recruits</label>
-<input type="number"
+<input
+type="number"
 id="recruitsCount"
 value="0"
 min="0"
 oninput="calculateRecruiter()">
  
-<label>Activation FYP</label>
-<input type="number"
-id="activationFyp"
+<label>Activation FYP Per Recruit</label>
+ 
+<div class="fyp-row">
+ 
+<input
+type="number"
+id="activationFyp1"
+placeholder="Recruit 1 FYP"
 value="0"
 oninput="calculateRecruiter()">
+ 
+<input
+type="number"
+id="activationFyp2"
+placeholder="Recruit 2 FYP"
+value="0"
+oninput="calculateRecruiter()">
+ 
+<input
+type="number"
+id="activationFyp3"
+placeholder="Recruit 3 FYP"
+value="0"
+oninput="calculateRecruiter()">
+ 
+</div>
  
 <div class="result" id="recruitBreakdown"></div>
  
@@ -167,9 +197,7 @@ Total Recruiter Bonus: 0 MMK
  
 </div>
  
-<!-- ========================= -->
-<!-- SUMMARY -->
-<!-- ========================= -->
+<!-- Summary -->
  
 <div class="section">
  
@@ -192,9 +220,36 @@ function formatMMK(value){
 return value.toLocaleString("en-US") + " MMK";
 }
  
-/* ===========================
-Candidate Calculator
-=========================== */
+/* Recruit Award */
+ 
+function getRecruitAward(count){
+ 
+if(count === 1) return 50000;
+if(count === 2) return 120000;
+if(count === 3) return 200000;
+if(count === 4) return 300000;
+if(count >= 5) return 400000;
+ 
+return 0;
+}
+ 
+/* Activation Bonus Per Recruit */
+ 
+function getActivationBonus(fyp){
+ 
+if(fyp > 10000000) return 800000;
+if(fyp >= 5000000) return 400000;
+if(fyp >= 4000000) return 240000;
+if(fyp >= 3000000) return 180000;
+if(fyp >= 2000000) return 120000;
+if(fyp >= 1000000) return 60000;
+if(fyp >= 500000) return 30000;
+if(fyp >= 200000) return 15000;
+ 
+return 0;
+}
+ 
+/* Candidate Calculator */
  
 function calculateCandidate(){
  
@@ -261,6 +316,7 @@ else if(fyp >= 500000)
 salesPayout = 50000;
 else if(fyp >= 200000)
 salesPayout = 25000;
+ 
 }
  
 candidateTotal =
@@ -282,20 +338,7 @@ formatMMK(candidateTotal);
 updateSummary();
 }
  
-/* ===========================
-Recruiter Calculator
-=========================== */
- 
-function getRecruitAward(count){
- 
-if(count === 1) return 50000;
-if(count === 2) return 120000;
-if(count === 3) return 200000;
-if(count === 4) return 300000;
-if(count >= 5) return 400000;
- 
-return 0;
-}
+/* Recruiter Calculator */
  
 function calculateRecruiter(){
  
@@ -305,35 +348,58 @@ parseInt(document.getElementById("recruitsCount").value) || 0;
 let recruitAward =
 getRecruitAward(recruitCount);
  
-let fyp =
-parseFloat(document.getElementById("activationFyp").value) || 0;
+let fyp1 =
+parseFloat(document.getElementById("activationFyp1").value) || 0;
  
-let activationBonus = 0;
+let fyp2 =
+parseFloat(document.getElementById("activationFyp2").value) || 0;
  
-if(fyp > 10000000)
-activationBonus = 800000;
-else if(fyp >= 5000000)
-activationBonus = 400000;
-else if(fyp >= 4000000)
-activationBonus = 240000;
-else if(fyp >= 3000000)
-activationBonus = 180000;
-else if(fyp >= 2000000)
-activationBonus = 120000;
-else if(fyp >= 1000000)
-activationBonus = 60000;
-else if(fyp >= 500000)
-activationBonus = 30000;
-else if(fyp >= 200000)
-activationBonus = 15000;
+let fyp3 =
+parseFloat(document.getElementById("activationFyp3").value) || 0;
+ 
+let bonus1 = getActivationBonus(fyp1);
+let bonus2 = getActivationBonus(fyp2);
+let bonus3 = getActivationBonus(fyp3);
+ 
+let activationBonus =
+bonus1 +
+bonus2 +
+bonus3;
  
 recruiterTotal =
 recruitAward +
 activationBonus;
  
 document.getElementById("recruitBreakdown").innerHTML =
-"Recruit Award: " + formatMMK(recruitAward) + "<br>" +
-"Activation Bonus: " + formatMMK(activationBonus);
+ 
+"Recruit Award: " +
+formatMMK(recruitAward) +
+ 
+"<br><br>" +
+ 
+"Recruit 1 FYP: " +
+formatMMK(fyp1) +
+" → Bonus: " +
+formatMMK(bonus1) +
+ 
+"<br>" +
+ 
+"Recruit 2 FYP: " +
+formatMMK(fyp2) +
+" → Bonus: " +
+formatMMK(bonus2) +
+ 
+"<br>" +
+ 
+"Recruit 3 FYP: " +
+formatMMK(fyp3) +
+" → Bonus: " +
+formatMMK(bonus3) +
+ 
+"<br><br>" +
+ 
+"Total Activation Bonus: " +
+formatMMK(activationBonus);
  
 document.getElementById("recResult").innerHTML =
 "Total Recruiter Bonus: " +
@@ -342,20 +408,25 @@ formatMMK(recruiterTotal);
 updateSummary();
 }
  
-/* ===========================
-Summary
-=========================== */
+/* Summary */
  
 function updateSummary(){
  
 document.getElementById("summary").innerHTML =
-"Candidate Reward: " + formatMMK(candidateTotal) +
+"Candidate Reward: " +
+formatMMK(candidateTotal) +
+ 
 "<br><br>" +
-"Recruiter Reward: " + formatMMK(recruiterTotal) +
-"<br><hr>" +
+ 
+"Recruiter Reward: " +
+formatMMK(recruiterTotal) +
+ 
+"<hr>" +
+ 
 "<strong>Total Campaign Reward: " +
 formatMMK(candidateTotal + recruiterTotal) +
 "</strong>";
+ 
 }
  
 calculateCandidate();
