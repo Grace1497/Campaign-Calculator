@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Payout Calculator 2026</title>
+ 
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#0b3d1e;
+color:#fff;
+margin:0;
+padding:20px;
+}
+ 
+.container{
+max-width:900px;
+margin:auto;
+background:#124e29;
+padding:20px;
+border-radius:10px;
+}
+ 
+h1,h2{
+text-align:center;
+color:#ffd700;
+}
+ 
+.section{
+background:#176035;
+padding:15px;
+margin-bottom:20px;
+border-radius:8px;
+}
+ 
+label{
+display:block;
+margin:10px 0 5px;
+font-weight:bold;
+}
+ 
+select,
+input{
+width:100%;
+padding:10px;
+border-radius:5px;
+border:1px solid #ccc;
+box-sizing:border-box;
+font-size:16px;
+}
+ 
+.result{
+background:#0b3d1e;
+padding:10px;
+margin-top:10px;
+border-radius:5px;
+}
+ 
+.total{
+color:#ffd700;
+font-weight:bold;
+font-size:1.2em;
+}
+ 
+hr{
+border:none;
+height:1px;
+background:#ffd700;
+margin:20px 0;
+}
+</style>
+</head>
+ 
+<body>
+ 
+<div class="container">
+ 
+<h1>Campaign Payout Calculator (2026)</h1>
+ 
+<!-- ========================= -->
+<!-- CANDIDATE -->
+<!-- ========================= -->
+ 
+<div class="section">
+ 
+<h2>Candidate Calculator</h2>
+ 
+<label>Sign-on Bonus</label>
+<select id="signOn" onchange="calculateCandidate()">
+<option value="0">None</option>
+<option value="1000000">MDRT 2024 (1,000,000)</option>
+<option value="1500000">MDRT 2025 / 2026 (1,500,000)</option>
+<option value="3500000">MDRT tied with another insurer (3,500,000)</option>
+<option value="100000">Existing License Holder (100,000)</option>
+<option value="100000">Exam Passed & License Waiting (100,000)</option>
+<option value="1000000">Myeik Existing License Holder (1,000,000)</option>
+<option value="500000">Myeik Exam Passed (500,000)</option>
+</select>
+ 
+<label>Road to YGN & MDY</label>
+<select id="roadYgnMdy" onchange="calculateCandidate()">
+<option value="0">None</option>
+<option value="200000">90 KM (200,000)</option>
+<option value="100000">70 KM (100,000)</option>
+</select>
+ 
+<label>Sales Category</label>
+<select id="candType" onchange="calculateCandidate()">
+<option value="rookie">Rookie</option>
+<option value="epos">ePOS Own Sale</option>
+</select>
+ 
+<label>FYP / Accumulated FYP</label>
+<input type="number"
+id="fypInput"
+value="0"
+oninput="calculateCandidate()">
+ 
+<div id="rookieAddOnDiv">
+ 
+<label>
+<input type="checkbox"
+id="rookieActive"
+onchange="calculateCandidate()">
+Add MMK 76,500 for M0 & M1 Active
+</label>
+ 
+</div>
+ 
+<div class="result" id="candBreakdown"></div>
+ 
+<div class="result total" id="candResult">
+Total Candidate Payout: 0 MMK
+</div>
+ 
+</div>
+ 
+<hr>
+ 
+<!-- ========================= -->
+<!-- RECRUITER -->
+<!-- ========================= -->
+ 
+<div class="section">
+ 
+<h2>Recruiter Calculator</h2>
+ 
+<label>Number of Recruits</label>
+<input type="number"
+id="recruitsCount"
+value="0"
+min="0"
+oninput="calculateRecruiter()">
+ 
+<label>Activation FYP</label>
+<input type="number"
+id="activationFyp"
+value="0"
+oninput="calculateRecruiter()">
+ 
+<div class="result" id="recruitBreakdown"></div>
+ 
+<div class="result total" id="recResult">
+Total Recruiter Bonus: 0 MMK
+</div>
+ 
+</div>
+ 
+<!-- ========================= -->
+<!-- SUMMARY -->
+<!-- ========================= -->
+ 
+<div class="section">
+ 
+<h2>Campaign Summary</h2>
+ 
+<div class="result total" id="summary">
+Total Campaign Reward: 0 MMK
+</div>
+ 
+</div>
+ 
+</div>
+ 
+<script>
+ 
+let candidateTotal = 0;
+let recruiterTotal = 0;
+ 
+function formatMMK(value){
+return value.toLocaleString("en-US") + " MMK";
+}
+ 
+/* ===========================
+Candidate Calculator
+=========================== */
+ 
+function calculateCandidate(){
+ 
+let signOn =
+parseFloat(document.getElementById("signOn").value) || 0;
+ 
+let road =
+parseFloat(document.getElementById("roadYgnMdy").value) || 0;
+ 
+let type =
+document.getElementById("candType").value;
+ 
+let fyp =
+parseFloat(document.getElementById("fypInput").value) || 0;
+ 
+let active =
+document.getElementById("rookieActive").checked;
+ 
+let salesPayout = 0;
+let addOn = 0;
+ 
+if(type === "rookie"){
+ 
+document.getElementById("rookieAddOnDiv").style.display = "block";
+ 
+if(fyp > 10000000)
+salesPayout = fyp * 0.18;
+else if(fyp >= 5000000)
+salesPayout = fyp * 0.14;
+else if(fyp >= 4000000)
+salesPayout = 480000;
+else if(fyp >= 3000000)
+salesPayout = 360000;
+else if(fyp >= 2000000)
+salesPayout = 240000;
+else if(fyp >= 1000000)
+salesPayout = 120000;
+else if(fyp >= 500000)
+salesPayout = 60000;
+else if(fyp >= 200000)
+salesPayout = 30000;
+ 
+if(active){
+addOn = 76500;
+}
+ 
+}else{
+ 
+document.getElementById("rookieAddOnDiv").style.display = "none";
+ 
+if(fyp > 10000000)
+salesPayout = fyp * 0.15;
+else if(fyp >= 5000000)
+salesPayout = fyp * 0.12;
+else if(fyp >= 4000000)
+salesPayout = 400000;
+else if(fyp >= 3000000)
+salesPayout = 300000;
+else if(fyp >= 2000000)
+salesPayout = 200000;
+else if(fyp >= 1000000)
+salesPayout = 100000;
+else if(fyp >= 500000)
+salesPayout = 50000;
+else if(fyp >= 200000)
+salesPayout = 25000;
+}
+ 
+candidateTotal =
+signOn +
+road +
+salesPayout +
+addOn;
+ 
+document.getElementById("candBreakdown").innerHTML =
+"Sign-on Bonus: " + formatMMK(signOn) + "<br>" +
+"Road Bonus: " + formatMMK(road) + "<br>" +
+"IA Main Campaign Reward: " + formatMMK(salesPayout) + "<br>" +
+"M0/M1 Add-on: " + formatMMK(addOn);
+ 
+document.getElementById("candResult").innerHTML =
+"Total Candidate Payout: " +
+formatMMK(candidateTotal);
+ 
+updateSummary();
+}
+ 
+/* ===========================
+Recruiter Calculator
+=========================== */
+ 
+function getRecruitAward(count){
+ 
+if(count === 1) return 50000;
+if(count === 2) return 120000;
+if(count === 3) return 200000;
+if(count === 4) return 300000;
+if(count >= 5) return 400000;
+ 
+return 0;
+}
+ 
+function calculateRecruiter(){
+ 
+let recruitCount =
+parseInt(document.getElementById("recruitsCount").value) || 0;
+ 
+let recruitAward =
+getRecruitAward(recruitCount);
+ 
+let fyp =
+parseFloat(document.getElementById("activationFyp").value) || 0;
+ 
+let activationBonus = 0;
+ 
+if(fyp > 10000000)
+activationBonus = 800000;
+else if(fyp >= 5000000)
+activationBonus = 400000;
+else if(fyp >= 4000000)
+activationBonus = 240000;
+else if(fyp >= 3000000)
+activationBonus = 180000;
+else if(fyp >= 2000000)
+activationBonus = 120000;
+else if(fyp >= 1000000)
+activationBonus = 60000;
+else if(fyp >= 500000)
+activationBonus = 30000;
+else if(fyp >= 200000)
+activationBonus = 15000;
+ 
+recruiterTotal =
+recruitAward +
+activationBonus;
+ 
+document.getElementById("recruitBreakdown").innerHTML =
+"Recruit Award: " + formatMMK(recruitAward) + "<br>" +
+"Activation Bonus: " + formatMMK(activationBonus);
+ 
+document.getElementById("recResult").innerHTML =
+"Total Recruiter Bonus: " +
+formatMMK(recruiterTotal);
+ 
+updateSummary();
+}
+ 
+/* ===========================
+Summary
+=========================== */
+ 
+function updateSummary(){
+ 
+document.getElementById("summary").innerHTML =
+"Candidate Reward: " + formatMMK(candidateTotal) +
+"<br><br>" +
+"Recruiter Reward: " + formatMMK(recruiterTotal) +
+"<br><hr>" +
+"<strong>Total Campaign Reward: " +
+formatMMK(candidateTotal + recruiterTotal) +
+"</strong>";
+}
+ 
+calculateCandidate();
+calculateRecruiter();
+ 
+</script>
+ 
+</body>
+</html>
